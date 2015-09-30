@@ -6,9 +6,21 @@ import load_tsv
 import random
 import sys
 
-#using grid based sampling, divide the state space into a grid and pick points probabilistically relative 
-#  to the number of points in the cell
+
 def parallel_density_sampling(filenames, outputfilename, feature_order, truth_idx, density_threshold, p, num_bins, num_parallel_jobs=8):
+    """
+    parallel_density_sampling:
+    Using grid based sampling, divide the state space into a grid and pick points probabilistically relative 
+    to the number of points in the cell
+    filenames : list of data sets to be used
+    outputfilename : output filename including path
+    feature_order : features to be used
+    truth_idx : Index of the data labels in the data set  
+    density_threshold : 
+    p :
+    num_bins :
+    num_parallel_jobs : Number of parallel jobs, the default is 8
+    """
     
     #parallel get mins and maxs
     job_args = []
