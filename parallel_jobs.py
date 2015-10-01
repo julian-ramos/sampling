@@ -2,9 +2,15 @@
 from multiprocessing import Pool
 import sys
 
-#func_to_run should take a single input which is a tuple of args
-#job_args is the list of all the argument tuples that should be run
+
 def parallel_jobs(func_to_run, job_args, num_parallel_jobs=8):
+    """
+    parallel_jobs
+    This function runs a function with the specified arguments in different processes
+    
+    func_to_run: This function should take a single input which is a tuple of args
+    job_args: List of all the argument tuples that should be run
+    """
     job_results = None
     
     pool = Pool(num_parallel_jobs)

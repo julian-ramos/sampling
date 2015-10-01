@@ -27,11 +27,18 @@ def query_sampling(in_args):
     different_count = numpy.zeros(len(features))
     for model in model_list:
         predict = model.predict(features)
-        same = numpy.equal(predict,truth) #i think this could be made faster
-        for i in range(len(same)):
-            if same[i]:
-                different_count[i] = different_count[i] + 1
         
+        
+#         same = numpy.equal(predict,truth) #i think this could be made faster
+#         for i in range(len(same)):
+#             if same[i]:
+#                 different_count[i] = different_count[i] + 1
+
+        #Here is an slightly faster version 
+        same = numpy.where(predict==truth)
+        different_count[same]+=1
+                                
+        numpy.argsort
     indexes = numpy.argsort(different_count)
     sample_idxs = indexes[-N:] #could grab only enough that there must be conflict, the grabs constant number
     
@@ -45,3 +52,6 @@ def query_sampling(in_args):
     inputfile.close()
         
     return [outputfilename, count]
+
+     
+

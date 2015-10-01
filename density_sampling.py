@@ -11,7 +11,15 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     """
     parallel_density_sampling:
     Using grid based sampling, divide the state space into a grid and pick points probabilistically relative 
-    to the number of points in the cell
+    to the number of points in the cell. In more detail the function takes the files passed and processes them.
+    First maximum and minimum for each of the features is computed for each file, later the results are combined.
+    After this is done the hyper-dimensional space of each file is segmented into cells and then counts of the data
+    points falling into each cell are computed. Finally the cells and its counts are merged. In a way this is similar
+    to kernel based density estimation where the kernel has no overlap also since this is in high dimensional space
+    kernel density estimation is not feasible. 
+     
+    
+     
     filenames : list of data sets to be used
     outputfilename : output filename including path
     feature_order : features to be used
