@@ -34,7 +34,7 @@ def query_sampling(in_args):
 #             if same[i]:
 #                 different_count[i] = different_count[i] + 1
 
-        #Here is an slightly faster version 
+        #Here is an slightly faster version, ran tests and the outputs are identical
         same = numpy.where(predict==truth)
         different_count[same]+=1
                                 
