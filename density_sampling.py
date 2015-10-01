@@ -30,6 +30,9 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
             print "Invalid starting probability"
             sys.stdout.flush()
         job_args.append((features))
+        
+    #This section of the code extracts minimums and maximums over the features on 
+    #small pieces of data
     job_results = parallel_jobs.parallel_jobs(compute_state_space,job_args,num_parallel_jobs)
     
     #merge mins and maxs of each feature and compute the stepsize
@@ -92,6 +95,12 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     return [outputfilename, count]
 
 def compute_state_space(in_args):
+    """
+    compute_state_space:
+    This function calculates the maximum and minimum for each feature in the data passed on 
+    in_args.
+    """
+    
     features = in_args
     
     minimum = numpy.zeros(len(features[0]))
@@ -137,3 +146,15 @@ def grid_sampling(in_args):
     inputfile.close()
         
     return [grid, text_lines]
+
+
+if __name__=="__main__":
+    print("Testing density sampling")
+    import load_tsv
+    import numpy
+    from sklearn.svm import SVC
+    import density_sampling
+
+    features, truth = load_tsv.load_tsv_features_truth("data/part1.tsv",[0,1,2],3)
+    vals = density_sampling.parallel_density_sampling(["data/part1.tsv", "data/part2.tsv"], "data/densitytest.tsv", [0,1,2], 3, 3, 0.2, 5, 8)    
+    print vals
