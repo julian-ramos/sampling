@@ -130,7 +130,7 @@ def compute_state_space(in_args):
 
 def grid_sampling(in_args):
     features, minimum, maximum, step_size, num_bins, filename = in_args
-        
+    print("working on file %s"%(filename))
     inputfile = open(filename, "r")
     
     grid = {}

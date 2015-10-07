@@ -12,6 +12,9 @@ def load_tsv_features_truth(filename, feature_order, truth_idx):
 
     for row in input_reader:
         feature_row = []
+        
+        if feature_order==[]:
+            feature_order=range(len(row))
         for i in range(len(feature_order)):
             feature_row.append(float(row[feature_order[i]]))
         features.append(numpy.array(feature_row))
