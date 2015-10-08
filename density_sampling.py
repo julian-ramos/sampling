@@ -5,6 +5,7 @@ import parallel_jobs
 import load_tsv
 import random
 import sys
+import instrumento as ins
 
 
 def parallel_density_sampling(filenames, outputfilename, feature_order, truth_idx, density_threshold, p, num_bins, num_parallel_jobs=8):
@@ -30,9 +31,16 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     num_parallel_jobs : Number of parallel jobs, the default is 8
     """
     
+    #Instrumentation code
+    ins.instrumento()
+    ins.act("start density sampling")
+    ins.params(filenames,outputfilename,feature_order,truth_idx,density_threshold,p,num_bins)
+    
     #parallel get mins and maxs
+    print("Calculating mins and maxs")
     job_args = []
     for filename in filenames:
+        print("working on file %s"%(filename))
         features, truth = load_tsv.load_tsv_features_truth(filename, feature_order, truth_idx)
         if p < 0 or p > 1: 
             print "Invalid starting probability"
@@ -61,6 +69,7 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     step_size = (maximum-minimum)/num_bins
     
     #put the samples in the grids and collect all the grids
+    print("starting sampling")
     job_args = []
     for filename in filenames:
         features, truth = load_tsv.load_tsv_features_truth(filename, feature_order, truth_idx)
@@ -99,7 +108,7 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     print "completed output"
     sys.stdout.flush()
     outputfile.close()
-    
+    ins.act("end parallel density sampling")
     return [outputfilename, count]
 
 def compute_state_space(in_args):

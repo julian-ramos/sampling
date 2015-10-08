@@ -6,9 +6,14 @@ import math
 import numpy
 import heapq
 import sklearn.linear_model
+import instrumento as ins
 
 def parallel_reg_uncertainty_sampling(model, filenames,feature_order, truth_idx, p, 
                                       number_parallel_jobs=8):
+    ins.instrumento()
+    ins.act("start uncertainty sampling")
+    ins.params(model, filenames,feature_order, truth_idx, p)
+    
     if p > 1.0 or p < 0.0:
         print "Invalid probability, must be (0.0,1.0)"
         
@@ -21,6 +26,8 @@ def parallel_reg_uncertainty_sampling(model, filenames,feature_order, truth_idx,
 
     job_results = parallel_jobs.parallel_jobs(reg_uncertainty_sampling, 
                                               job_args, number_parallel_jobs)
+    
+    ins.act("end uncertainty sampling")
     return job_results
 
 # the model must have a score function that outputs the R^2 value up to 1.0 
@@ -61,6 +68,10 @@ def reg_uncertainty_sampling(in_args):
 def parallel_maxent_uncertainty_sampling(model, filenames, 
                                          feature_order, truth_idx, 
                                          p, number_parallel_jobs=8):
+    
+    ins.instrumento()
+    ins.act("start maxent_uncertainty sampling")
+    ins.params(model, filenames,feature_order, truth_idx, p)
     if p > 1.0 or p < 0.0:
         print "Invalid probability, must be (0.0,1.0)"
         
@@ -73,6 +84,7 @@ def parallel_maxent_uncertainty_sampling(model, filenames,
 
     job_results = parallel_jobs.parallel_jobs(class_maxentunc_sampling, 
                                               job_args, number_parallel_jobs)
+    ins.act("end maxent_uncertainty sampling")
     return job_results
         
 # maximum entropy uncertainty sampling for classification algorithms
@@ -123,6 +135,10 @@ def class_maxentunc_sampling(in_args):
 def parallel_smallmargin_uncertainty_sampling(model, filenames, 
                                               feature_order, truth_idx, 
                                               p, number_parallel_jobs=8):
+    
+    ins.instrumento()
+    ins.act("start small_margin_uncertainty sampling")
+    ins.params(model, filenames,feature_order, truth_idx, p)
     if p > 1.0 or p < 0.0:
         print "Invalid probability, must be (0.0,1.0)"
         
@@ -135,6 +151,7 @@ def parallel_smallmargin_uncertainty_sampling(model, filenames,
 
     job_results = parallel_jobs.parallel_jobs(class_smallmarginunc_sampling, 
                                               job_args, number_parallel_jobs)
+    ins.act("end small_margin_uncertainty sampling")
     return job_results
 
 

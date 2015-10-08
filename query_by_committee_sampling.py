@@ -3,9 +3,13 @@ import numpy
 import parallel_jobs
 import load_tsv
 import random
+import instrumento as ins
 
 #p is the probability of choosing a sample that classified differenty by >= 2 classifiers
 def parallel_query_sampling(model_list, filenames, feature_order, truth_idx, p, num_parallel_jobs=8):
+    ins.instrumento()
+    ins.act("start QBC sampling")
+    ins.params(model_list, filenames, feature_order, truth_idx, p)
     if p >= 1.0 or p < 0.0: 
         print "Invalid probability, must be (0.0, 1.0]"
         
@@ -15,9 +19,11 @@ def parallel_query_sampling(model_list, filenames, feature_order, truth_idx, p, 
         job_args.append((model_list, features, truth, int(p*len(features)), filename))
             
     job_results = parallel_jobs.parallel_jobs(query_sampling,job_args,num_parallel_jobs)
+    ins.act("end QBC sampling")
     return job_results
 
 def query_sampling(in_args):
+    
     model_list, features, truth, N, filename = in_args
         
     outputfilename = filename+"-query-"+str(N)

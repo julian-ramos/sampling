@@ -1,10 +1,14 @@
 import parallel_jobs
 import random
+import instrumento as ins
 
 #p is the probability of each sample from each file being chosen 
 #   Note, we are not guaranteeing that p*filesize samples will be chosen
 #filenames are strings of files to open and sample from
 def parallel_random_sampling(p, filenames, num_parallel_jobs=8):
+    ins.instrumento()
+    ins.act("start random sampling")
+    ins.params(p, filenames)
     if p >= 1.0 or p < 0.0: 
         print "Invalid probability, must be (0.0, 1.0]"
         
@@ -13,6 +17,7 @@ def parallel_random_sampling(p, filenames, num_parallel_jobs=8):
         job_args.append((p,filename))
             
     job_results = parallel_jobs.parallel_jobs(random_sampling,job_args,num_parallel_jobs)
+    ins.act("end random sampling")
     return job_results
 
 def random_sampling(in_args):
@@ -40,6 +45,9 @@ def random_sampling(in_args):
 # bottom_left is all the smaller values, top_right is all the larger values
 # assumes tab separated format
 def parallel_outbox_sampling(bottom_left, top_right, p, filenames, num_parallel_jobs=8):
+    ins.instrumento()
+    ins.act("start outbox sampling")
+    ins.params(bottom_left, top_right, p, filenames)
     if p > 1.0 or p < 0.0: 
         print "Invalid probability, must be (0.0, 1.0]"
     
@@ -48,6 +56,7 @@ def parallel_outbox_sampling(bottom_left, top_right, p, filenames, num_parallel_
         job_args.append((bottom_left, top_right, p, filename))
             
     job_results = parallel_jobs.parallel_jobs(outbox_sampling,job_args,num_parallel_jobs)
+    ins.act("end outbox sampling")
     return job_results
 
     
@@ -88,6 +97,9 @@ def outbox_sampling(in_args):
 # bottom_left is all the smaller values, top_right is all the larger values
 # assumes tab separated format
 def parallel_inbox_sampling(bottom_left, top_right, p, filenames, num_parallel_jobs=8):
+    ins.instrumento()
+    ins.act("start inbox sampling")
+    ins.params(bottom_left, top_right, p, filenames)
     if p >= 1.0 or p < 0.0: 
         print "Invalid probability, must be (0.0, 1.0]"
         
@@ -96,6 +108,7 @@ def parallel_inbox_sampling(bottom_left, top_right, p, filenames, num_parallel_j
         job_args.append((bottom_left, top_right, p, filename))
             
     job_results = parallel_jobs.parallel_jobs(inbox_sampling,job_args,num_parallel_jobs)
+    ins.act("end inbox sampling")
     return job_results
 
 def inbox_sampling(in_args):
