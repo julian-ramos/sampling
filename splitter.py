@@ -1,11 +1,11 @@
 import csv
 
-def splitter(filename,path,prefix,lines):
+def splitter(filename,path,prefix="random",lines=50000):
     """
     Splits the data set into a number of subsets.
     filename : Original file to split
-    path : path to the where the files are going to be stored
-    prefix : This is the name for each of the subsets plus a numer for instance
+    path : path to where the files are going to be stored
+    prefix : This is the name for each of the subsets plus a number for instance
     if prefix = subset then the stored file name will be subset_1.tsv, subset_2.tsv ....
     lines : Number of lines to be stored on each file created, the last file will always have at
     most this number of lines
@@ -17,6 +17,7 @@ def splitter(filename,path,prefix,lines):
     output_writer=csv.writer(output_file,delimiter="\t")
     count=0
     filenum=1
+    files=[]
     for row in input_reader:
         output_writer.writerow(row)
         count+=1
@@ -24,10 +25,12 @@ def splitter(filename,path,prefix,lines):
             count=0
             output_file.close()
             filenum+=1
-            output_file=open(path+"/"+prefix+"_%d.tsv"%(filenum),"w")
+            filename=path+"/"+prefix+"_%d.tsv"%(filenum)
+            output_file=open(filename,"w")
             output_writer=csv.writer(output_file,delimiter="\t")
-
+            files.append(filename)
     input_file.close()
+    return files
     
     
 if __name__=="__main__":

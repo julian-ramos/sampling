@@ -1,4 +1,4 @@
-
+import shutil
 import numpy
 import math
 import parallel_jobs
@@ -6,6 +6,7 @@ import load_tsv
 import random
 import sys
 import instrumento as ins
+import dataOps as dO
 
 
 def parallel_density_sampling(filenames, outputfilename, feature_order, truth_idx, density_threshold, p, num_bins, num_parallel_jobs=8):
@@ -31,10 +32,13 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     num_parallel_jobs : Number of parallel jobs, the default is 8
     """
     
+    folderstoDelete,files=dO.createSplitFolder(filenames)
+    
+    filenames=files
     #Instrumentation code
-    ins.instrumento()
-    ins.act("start density sampling")
-    ins.params(filenames,outputfilename,feature_order,truth_idx,density_threshold,p,num_bins)
+    log=ins.instrumento()
+    log.act("start density sampling")
+    log.params(filenames,outputfilename,feature_order,truth_idx,density_threshold,p,num_bins)
     
     #parallel get mins and maxs
     print("Calculating mins and maxs")
@@ -108,7 +112,11 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     print "completed output"
     sys.stdout.flush()
     outputfile.close()
-    ins.act("end parallel density sampling")
+    
+    for i in folderstoDelete:
+        shutil.rmtree(i)
+    
+    log.act("end parallel density sampling")
     return [outputfilename, count]
 
 def compute_state_space(in_args):
@@ -172,6 +180,6 @@ if __name__=="__main__":
     from sklearn.svm import SVC
     import density_sampling
 
-    features, truth = load_tsv.load_tsv_features_truth("data/part1.tsv",[0,1,2],3)
-    vals = density_sampling.parallel_density_sampling(["data/part1.tsv", "data/part2.tsv"], "data/densitytest.tsv", [0,1,2], 3, 3, 0.2, 5, 8)    
+#     features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/user_bot_data.tsv",[0,1,2],3)
+    vals = density_sampling.parallel_density_sampling(["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"], "/Users/ingenia/git/data/data_sampling/user_bot_data_density_sample.tsv", [0,1,2], 3, 3, 0.2, 5, 8)    
     print vals
