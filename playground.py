@@ -1,33 +1,43 @@
-import os
-import density_sampling as dsam
-import time
-import psutil, os
-
-# Increasing priority
-p = psutil.Process(os.getpid())
-p.nice(10)
-
-time_in_millis = lambda: int(round(time.time() * 1000))
-
-
-mainFile="/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"
-path="/Users/ingenia/git/data/data_sampling/splits"
-files=os.listdir(path)
-
-files=[path+"/"+i for i in files]
-print(files)
+# import sys
+# sys.path.append("/Users/ingenia/git/instrumento/")
+# sys.path.append("/Users/ingenia/git/utilityFuncs/")
+# import random_sampling
+# 
+# 
+# 
+# path="/Users/ingenia/git/data/data_sampling/previous_data/"
+# print random_sampling.parallel_random_sampling(0.1,[path+"part1.tsv",path+"part2.tsv"], "/Users/ingenia/git/data/data_sampling/previous_data/rand_sample.tsv")
+# print random_sampling.parallel_outbox_sampling((30,30,"*","*"),(60,60,"*","*"),0.1,[path+"part1.tsv",path+"part2.tsv"], 8)
+# print random_sampling.parallel_inbox_sampling((30,30,"*","*"),(60,60,"*","*"),0.1,[path+"part1.tsv",path+"part2.tsv"], 8)
 
 
-outputfilename="/Users/ingenia/git/data/data_sampling/samples/sample1_split.tsv"
+# import sys
+# sys.path.append("/Users/ingenia/git/instrumento/")
+# sys.path.append("/Users/ingenia/git/utilityFuncs/")
+# 
+# import instrumento as ins
+# 
+# 
+# log=ins.instrumento(filename="./someTest1.txt",printout=True)
+# log.act("start")
+# log.paramString("LogisticRegression(penalty=\"l1\",C=0.1)")
+# a=1
+# b=2
+# c=3
+# log.params(a,b,c)
+# log.sum("accuracy = 0.7")
+# log.act("end")
+from numpy import NaN
+import numpy as np
+a=[[1, 2 ,3],[4,5,6]]
+a=np.array(a)
+b=a[:,:2]
+d=a[:,2]
+print(b.shape)
+print(d.shape)
+c=np.c_[b,d]
+print(c)
+# print(a)
+# print(np.vstack((a[:,0],a[:,2])))
 
-t0=time_in_millis()
-dsam.parallel_density_sampling(files,outputfilename,range(2,20) ,3, 3, 0.2, 10, num_parallel_jobs=8)
-t1=time_in_millis()
-print(t1-t0,(t1-t0)/1000.0/60.0,"Time spent using multiple files")
 
-
-outputfilename="/Users/ingenia/git/data/data_sampling/samples/sample1_whole.tsv"
-t2=time_in_millis()
-dsam.parallel_density_sampling([mainFile],outputfilename,range(2,20) ,3, 3, 0.2, 10,  num_parallel_jobs=8)
-t3=time_in_millis()
-print(t3-t2,(t3-t2)/1000.0/60.0,"Time spent using a single file")

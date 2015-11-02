@@ -1,7 +1,9 @@
+# import sys
+# sys.path.append("/Users/ingenia/git/instrumento/")
+
 import parallel_jobs
 import random
 import instrumento as ins
-
 import stringUtils as sU
 import os
 import numpy as np
@@ -215,5 +217,11 @@ def inbox_sampling(in_args):
 
 if __name__=="__main__":
     print("Testing random sampling")
-    parallel_random_sampling(0.1, ["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"], 
-                             "/Users/ingenia/git/data/data_sampling/random_sample.tsv")
+#     parallel_random_sampling(0.1, ["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"], 
+#                              "/Users/ingenia/git/data/data_sampling/random_sample.tsv")
+    
+    path="/Users/ingenia/git/data/data_sampling/previous_data/"
+    
+    print parallel_random_sampling(0.1,[path+"part1.tsv",path+"part2.tsv"], "/Users/ingenia/git/data/data_sampling/previous_data/rand_sample.tsv")
+    print parallel_outbox_sampling((30,30,"*","*"),(60,60,"*","*"),0.1,[path+"part1.tsv",path+"part2.tsv"], 8)
+    print parallel_inbox_sampling((30,30,"*","*"),(60,60,"*","*"),0.1,[path+"part1.tsv",path+"part2.tsv"], 8)

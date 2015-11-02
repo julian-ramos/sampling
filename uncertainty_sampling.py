@@ -10,9 +10,9 @@ import instrumento as ins
 
 def parallel_reg_uncertainty_sampling(model, filenames,feature_order, truth_idx, p, 
                                       number_parallel_jobs=8):
-    ins.instrumento()
-    ins.act("start uncertainty sampling")
-    ins.params(model, filenames,feature_order, truth_idx, p)
+    log=ins.instrumento()
+    log.act("start uncertainty sampling")
+    log.params(model, filenames,feature_order, truth_idx, p)
     
     if p > 1.0 or p < 0.0:
         print "Invalid probability, must be (0.0,1.0)"
@@ -27,7 +27,7 @@ def parallel_reg_uncertainty_sampling(model, filenames,feature_order, truth_idx,
     job_results = parallel_jobs.parallel_jobs(reg_uncertainty_sampling, 
                                               job_args, number_parallel_jobs)
     
-    ins.act("end uncertainty sampling")
+    log.act("end uncertainty sampling")
     return job_results
 
 # the model must have a score function that outputs the R^2 value up to 1.0 
@@ -69,9 +69,9 @@ def parallel_maxent_uncertainty_sampling(model, filenames,
                                          feature_order, truth_idx, 
                                          p, number_parallel_jobs=8):
     
-    ins.instrumento()
-    ins.act("start maxent_uncertainty sampling")
-    ins.params(model, filenames,feature_order, truth_idx, p)
+    log=ins.instrumento()
+    log.act("start maxent_uncertainty sampling")
+    log.params(model, filenames,feature_order, truth_idx, p)
     if p > 1.0 or p < 0.0:
         print "Invalid probability, must be (0.0,1.0)"
         
@@ -84,7 +84,7 @@ def parallel_maxent_uncertainty_sampling(model, filenames,
 
     job_results = parallel_jobs.parallel_jobs(class_maxentunc_sampling, 
                                               job_args, number_parallel_jobs)
-    ins.act("end maxent_uncertainty sampling")
+    log.act("end maxent_uncertainty sampling")
     return job_results
         
 # maximum entropy uncertainty sampling for classification algorithms
@@ -136,9 +136,9 @@ def parallel_smallmargin_uncertainty_sampling(model, filenames,
                                               feature_order, truth_idx, 
                                               p, number_parallel_jobs=8):
     
-    ins.instrumento()
-    ins.act("start small_margin_uncertainty sampling")
-    ins.params(model, filenames,feature_order, truth_idx, p)
+    log=ins.instrumento()
+    log.act("start small_margin_uncertainty sampling")
+    log.params(model, filenames,feature_order, truth_idx, p)
     if p > 1.0 or p < 0.0:
         print "Invalid probability, must be (0.0,1.0)"
         
@@ -151,14 +151,22 @@ def parallel_smallmargin_uncertainty_sampling(model, filenames,
 
     job_results = parallel_jobs.parallel_jobs(class_smallmarginunc_sampling, 
                                               job_args, number_parallel_jobs)
-    ins.act("end small_margin_uncertainty sampling")
+    log.act("end small_margin_uncertainty sampling")
     return job_results
 
 
-# smallest margin uncertainty sampling for classification algorithms
-# requires that the model passed in has a predict_proba function
-# returns the N samples with smallest margin between top 2 classes y1 and y2 
+ 
 def class_smallmarginunc_sampling(in_args):
+    """
+    smallest margin uncertainty sampling for classification algorithms
+    requires that the model passed in has a predict_proba function
+    in order to get this predict_proba when training the classification 
+    model the probability=True must be passed when initializing the 
+    classifier
+    
+    returns the N samples with smallest margin between top 2 classes y1 and y2
+    
+    """
     model, features, N, filename = in_args
     
     count = 0
@@ -205,4 +213,20 @@ def class_smallmarginunc_sampling(in_args):
 #                                      [0,1,2], 3, 
 #                                      1.0, 1.0, 
 #                                      number_parallel_jobs=8)
+    
+    
+if __name__=="__main__":
+    
+    #In progress
+    
+    import load_tsv
+    import numpy
+    from sklearn import linear_model
+    import uncertainty_sampling
+    
+    features, truth = load_tsv.load_tsv_features_truth("data/part1.tsv",[0,1,2],3)
+    linreg = linear_model.LinearRegression()
+    linreg.fit(features, truth)
+    vals = uncertainty_sampling.parallel_reg_uncertainty_sampling(linreg,["data/part1.tsv", "data/part2.tsv"],[0,1,2],3,0.1,1)
+    print vals
     
