@@ -1,5 +1,5 @@
 import dataOps as dO
-import numpy
+import numpy 
 import parallel_jobs
 import load_tsv
 import random
@@ -74,17 +74,50 @@ if __name__=="__main__":
     import load_tsv
     import numpy
     from sklearn.svm import SVC
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.naive_bayes import GaussianNB
+    from sklearn.externals import joblib
+
     import query_by_committee_sampling
     
     print("Testing query by committee")
     
-    features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv",[0,1,2],3)
+    filename="/Users/ingenia/Google Drive/Research collaborations/big data mining/data-validation/datasets/user_bot_data.tsv"
+    sampleFilename="/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"
+    
+    features, truth = load_tsv.load_tsv_features_truth(filename,range(2,29),1)
+    
+    inds=numpy.argwhere(truth==1)
+    
+    botsInds=numpy.random.choice(inds.flatten(),50)
+    trainInds=numpy.random.choice(range(features.shape[0]),4950)
+    inter=numpy.intersect1d(trainInds, botsInds, assume_unique=True)
+    
+    trainInds=numpy.setdiff1d(trainInds,botsInds)
+    trainInds=numpy.r_[trainInds,botsInds]
+    trainData=features[trainInds,:]
+    trainLabels=truth[trainInds]
+    
+    
     # Create, fit, predict with the SVM Classifier
     svm = SVC(C=1, kernel="linear", probability=True, max_iter=50000)
-    svm.fit(features, truth)
+    svm.fit(trainData, trainLabels)
+    
+    lr =LogisticRegression()
+    lr.fit(trainData,trainLabels)
+    
+    nb = GaussianNB()
+    nb.fit(trainData,trainLabels)
+    
+    joblib.dump(svm, 'svm.pkl') 
+    joblib.dump(nb, 'rb.pkl')
+    joblib.dump(lr, 'lr.pkl')
+    
+    
+    
     #vals = query_by_committee_sampling.query_sampling(([svm], features, truth, 0.1, "data/part1.tsv"))
     #features, truth = load_tsv.load_tsv_features_truth("data/part1.tsv", [0,1,2], 3)
-    vals = query_by_committee_sampling.parallel_query_sampling([svm],["/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"]  ,[0,1,2],3,0.1,1)
-    print vals
+#     vals = query_by_committee_sampling.parallel_query_sampling([svm],["/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"]  ,[0,1,2],3,0.1,1)
+    
      
 
