@@ -100,6 +100,8 @@ if __name__=="__main__":
     
     
     # Create, fit, predict with the SVM Classifier
+    
+    
     svm = SVC(C=1, kernel="linear", probability=True, max_iter=50000)
     svm.fit(trainData, trainLabels)
     
