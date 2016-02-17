@@ -82,7 +82,8 @@ if __name__=="__main__":
     
     print("Testing query by committee")
     
-    filename="/Users/ingenia/Google Drive/Research collaborations/big data mining/data-validation/datasets/user_bot_data.tsv"
+#     filename="/Users/ingenia/Google Drive/Research collaborations/big data mining/data-validation/datasets/user_bot_data.tsv"
+    filename="/home/julian/data/user_bot_data.tsv"
     sampleFilename="/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"
     
     features, truth = load_tsv.load_tsv_features_truth(filename,range(2,29),1)
@@ -109,9 +110,9 @@ if __name__=="__main__":
     nb = GaussianNB()
     nb.fit(trainData,trainLabels)
     
-    joblib.dump(svm, 'svm.pkl') 
-    joblib.dump(nb, 'rb.pkl')
-    joblib.dump(lr, 'lr.pkl')
+    joblib.dump(svm, './clfs/svm.pkl') 
+    joblib.dump(nb, './clfs/rb.pkl')
+    joblib.dump(lr, './clfs/lr.pkl')
     
     
     
