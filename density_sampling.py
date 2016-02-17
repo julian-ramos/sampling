@@ -84,7 +84,7 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     print "merging output"
     sys.stdout.flush()
     #merge the grids, sample, and print the results
-    outputfile = open(outputfilename,"w")
+    #outputfile = open(outputfilename,"w")
     grid = job_results2[0][0]
     text_lines = job_results2[0][1]
     for i in range(1,len(job_results2)):
@@ -179,7 +179,13 @@ if __name__=="__main__":
     import numpy
     from sklearn.svm import SVC
     import density_sampling
-
+    path="/home/julian/data/"
+    ins=ins.instrumento(path=path,logname="log.txt")
 #     features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/user_bot_data.tsv",[0,1,2],3)
-    vals = density_sampling.parallel_density_sampling(["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"], "/Users/ingenia/git/data/data_sampling/user_bot_data_density_sample.tsv", [0,1,2], 3, 3, 0.2, 5, 8)    
+    originalFile=["/home/julian/data/user_bot_data.tsv"]
+    
+#     files=["user_bot_part00","user_bot_part01","user_bot_part02","user_bot_part03","user_bot_part04","user_bot_part05","user_bot_part06","user_bot_part07"]
+#     files=[ path+i for i in files]
+
+    vals = density_sampling.parallel_density_sampling(originalFile, "/home/julian/data/user_bot_data_density_sample.tsv", range(2,29,1), 1, 0, 0.025, 5, 8)
     print vals
