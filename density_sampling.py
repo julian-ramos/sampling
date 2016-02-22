@@ -9,7 +9,7 @@ import instrumento as ins
 import dataOps as dO
 
 
-def parallel_density_sampling(filenames, outputfilename, feature_order, truth_idx, density_threshold, p, num_bins, num_parallel_jobs=8):
+def parallel_density_sampling(filenames, outputfilename, feature_order, truth_idx, density_threshold, p, num_bins, num_parallel_jobs=8,testMode=False):
     """
     parallel_density_sampling:
     Using grid based sampling, divide the state space into a grid and pick points probabilistically relative 
@@ -32,7 +32,7 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     num_parallel_jobs : Number of parallel jobs, the default is 8
     """
     
-    folderstoDelete,files=dO.createSplitFolder(filenames,testMode=True)
+    folderstoDelete,files=dO.createSplitFolder(filenames,testMode=testMode)
     
     filenames=files
     #Instrumentation code
@@ -204,5 +204,5 @@ if __name__=="__main__":
 #     files=["user_bot_part00","user_bot_part01","user_bot_part02","user_bot_part03","user_bot_part04","user_bot_part05","user_bot_part06","user_bot_part07"]
 #     files=[ path+i for i in files]
 
-    vals = density_sampling.parallel_density_sampling(originalFile, outputFile, range(2,29,1), 1, 0, 0.025, 5, 8)
+    vals = density_sampling.parallel_density_sampling(originalFile, outputFile, range(2,29,1), 1, 0, 0.025, 5)
     print vals
