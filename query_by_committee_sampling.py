@@ -14,16 +14,18 @@ def parallel_query_sampling(model_list, filenames, feature_order, truth_idx, p, 
     if p >= 1.0 or p < 0.0: 
         print "Invalid probability, must be (0.0, 1.0]"
         
-    job_args = []
+#     job_args = []
     
     folderstoDetele,filenames=dO.createSplitFolder(filenames)
     
     
     for filename in filenames:
-        features, truth = load_tsv.load_tsv_features_truth(filename, feature_order, truth_idx)
-        job_args.append((model_list, features, truth, int(p*len(features)), filename))
+        job_args=[]
+        for i in range(8):
+            features, truth = load_tsv.load_tsv_features_truth(filename, feature_order, truth_idx)
+            job_args.append((model_list, features, truth, int(p*len(features)), filename))
             
-    job_results = parallel_jobs.parallel_jobs(query_sampling,job_args,num_parallel_jobs)
+        job_results = parallel_jobs.parallel_jobs(query_sampling,job_args,num_parallel_jobs)
     
     for i in folderstoDetele:
         shutil.rmtree(i)
@@ -54,7 +56,7 @@ def query_sampling(in_args):
         same = numpy.where(predict==truth)
         different_count[same]+=1
                                 
-        numpy.argsort
+        
     indexes = numpy.argsort(different_count)
     sample_idxs = indexes[-N:] #could grab only enough that there must be conflict, the grabs constant number
     
@@ -80,47 +82,66 @@ if __name__=="__main__":
 
     import query_by_committee_sampling
     
-    print("Testing query by committee")
+    generateModels=False
+    generateSample=True
     
-#     filename="/Users/ingenia/Google Drive/Research collaborations/big data mining/data-validation/datasets/user_bot_data.tsv"
-    filename="/home/julian/data/user_bot_data.tsv"
-    sampleFilename="/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"
+    if generateModels:
+        print("Generating models for query by committee")
+        
+        filename="/Users/ingenia/Google Drive/Research collaborations/big data mining/data-validation/datasets/user_bot_data.tsv"
+    #     filename="/home/julian/data/user_bot_data.tsv"
+        sampleFilename="/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"
+        
+        features, truth = load_tsv.load_tsv_features_truth(filename,range(2,29),1)
+        
+        inds=numpy.argwhere(truth==1)
+        
+        botsInds=numpy.random.choice(inds.flatten(),50)
+        trainInds=numpy.random.choice(range(features.shape[0]),4950)
+        inter=numpy.intersect1d(trainInds, botsInds, assume_unique=True)
+        
+        trainInds=numpy.setdiff1d(trainInds,botsInds)
+        trainInds=numpy.r_[trainInds,botsInds]
+        trainData=features[trainInds,:]
+        trainLabels=truth[trainInds]
+        
+        trainData=numpy.delete(trainData,25,1)
+        
+        # Create, fit, predict with the SVM Classifier
+        
+    #     nanInds=numpy.argwhere(numpy.isnan(trainData))
+    #     trainData=numpy.delete(trainData,nanInds[:,0],0)
+        
+        svm = SVC(C=1, kernel="linear", probability=True, max_iter=50000)
+        svm.fit(trainData, trainLabels)
+        
+        lr =LogisticRegression()
+        lr.fit(trainData,trainLabels)
+        
+        nb = GaussianNB()
+        nb.fit(trainData,trainLabels)
+        
+        joblib.dump(svm, './clfs/svm.pkl')
+        joblib.dump(lr, './clfs/lr.pkl') 
+        joblib.dump(nb, './clfs/nb.pkl')
     
-    features, truth = load_tsv.load_tsv_features_truth(filename,range(2,29),1)
-    
-    inds=numpy.argwhere(truth==1)
-    
-    botsInds=numpy.random.choice(inds.flatten(),50)
-    trainInds=numpy.random.choice(range(features.shape[0]),4950)
-    inter=numpy.intersect1d(trainInds, botsInds, assume_unique=True)
-    
-    trainInds=numpy.setdiff1d(trainInds,botsInds)
-    trainInds=numpy.r_[trainInds,botsInds]
-    trainData=features[trainInds,:]
-    trainLabels=truth[trainInds]
-    
-    
-    # Create, fit, predict with the SVM Classifier
-    
-    
-    svm = SVC(C=1, kernel="linear", probability=True, max_iter=50000)
-    svm.fit(trainData, trainLabels)
-    
-    lr =LogisticRegression()
-    lr.fit(trainData,trainLabels)
-    
-    nb = GaussianNB()
-    nb.fit(trainData,trainLabels)
-    
-    joblib.dump(svm, './clfs/svm.pkl') 
-    joblib.dump(nb, './clfs/rb.pkl')
-    joblib.dump(lr, './clfs/lr.pkl')
-    
-    
-    
-    #vals = query_by_committee_sampling.query_sampling(([svm], features, truth, 0.1, "data/part1.tsv"))
+    if generateSample:
+        filename="/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"
+        features=range(2,29)
+        features.pop(25)
+        svm = joblib.load('./clfs/svm.pkl') 
+        lr= joblib.load('./clfs/lr.pkl')
+        nb = joblib.load('./clfs/nb.pkl')
+        filenameSample="/Users/ingenia/git/data/data_sampling/bots_sample.tsv"
+        
+        data, labels = load_tsv.load_tsv_features_truth(filename, features, 1)
+        
+        query_sampling([[svm,lr,nb], data, labels, int(0.0025*2e6), filename])
+#         vals = query_by_committee_sampling.parallel_query_sampling([svm],["/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"]  ,[0,1,2],3,0.1,1)
+        
+#         vals = query_by_committee_sampling.parallel_query_sampling([svm,nb,lr],[filename], features,1, 0.0025)
     #features, truth = load_tsv.load_tsv_features_truth("data/part1.tsv", [0,1,2], 3)
-#     vals = query_by_committee_sampling.parallel_query_sampling([svm],["/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"]  ,[0,1,2],3,0.1,1)
+    
     
      
 

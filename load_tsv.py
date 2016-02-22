@@ -6,9 +6,13 @@ import numpy
 def load_tsv_features_truth(filename, feature_order, truth_idx):
     features = []
     truth = []
+    
+    with open(filename, 'r') as csvfile:
+        dialect = csv.Sniffer().sniff(csvfile.read(), delimiters='\t ')
 
     input_file = open(filename, 'r')
-    input_reader = csv.reader(input_file, delimiter="\t")
+    
+    input_reader = csv.reader(input_file, dialect)
 
     for row in input_reader:
         feature_row = []

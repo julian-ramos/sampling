@@ -32,7 +32,7 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     num_parallel_jobs : Number of parallel jobs, the default is 8
     """
     
-    folderstoDelete,files=dO.createSplitFolder(filenames)
+    folderstoDelete,files=dO.createSplitFolder(filenames,testMode=True)
     
     filenames=files
     #Instrumentation code
@@ -88,20 +88,25 @@ def parallel_density_sampling(filenames, outputfilename, feature_order, truth_id
     grid = job_results2[0][0]
     text_lines = job_results2[0][1]
     for i in range(1,len(job_results2)):
-        for key in job_results2[i][0].keys():
-            if grid.get(key) == None:
-                grid[key] = job_results2[i][0][key]
-                text_lines[key] = job_results2[i][1][key]
-            else: #must merge two counts and two lists 
+        for key in job_results2[i][0]:
+#             if key not in grid:
+            try:
                 grid[key] = grid[key] + job_results2[i][0][key]
                 text_lines[key] = text_lines[key]+job_results2[i][1][key]
+            except KeyError:
+#             else: #must merge two counts and two lists
+                grid[key] = job_results2[i][0][key]
+                text_lines[key] = job_results2[i][1][key] 
+                
     
     print "sampling"
     sys.stdout.flush()
     #randomly sample proportional to the set in the grid cell
     count = 0
     outputfile = open(outputfilename,"w")
-    for key in grid.keys():
+    
+    
+    for key in grid:
         if grid[key] >= density_threshold:
             for line in text_lines[key]:
                 if random.random() < p:
@@ -128,12 +133,14 @@ def compute_state_space(in_args):
     
     features = in_args
     
-    minimum = numpy.zeros(len(features[0]))
-    maximum = numpy.zeros(len(features[0]))
+#     minimum = numpy.zeros(len(features[0]))
+#     maximum = numpy.zeros(len(features[0]))
     
-    for i in range(len(features[0])):
-        minimum[i] = features[0][i]
-        maximum[i] = features[0][i]
+    minimum=[ float("inf") for i in range(len(features[0]))]
+    maximum=[ -float("inf") for i in range(len(features[0]))]
+#     for i in range(len(features[0])):
+#         minimum[i] = features[0][i]
+#         maximum[i] = features[0][i]
     
     for observation in features:
         for feature in range(len(observation)):
@@ -156,17 +163,18 @@ def grid_sampling(in_args):
     sys.stdout.flush()
     for observation in features:
         line = inputfile.readline()
-        grid_idx = numpy.zeros(len(observation))
-        for i in range(len(observation)):
-            grid_idx[i] = math.floor((observation[i]-minimum[i])/step_size[i])
+#         grid_idx = numpy.zeros(len(observation))
+        #List comprehension to speed up the process
+        grid_idx =[ math.floor((observation[i]-minimum[i])/step_size[i]) for i in range(len(observation))]
         grid_idx = tuple(grid_idx)
-        if grid_idx not in grid.keys():
-            grid[grid_idx] = 1
-            text_lines[grid_idx] = [line]
-        else:
+#         if grid_idx in grid:
+        try:
             grid[grid_idx] = grid[grid_idx] +1
             text_lines[grid_idx].append(line)
-            
+        except KeyError:
+#         else:
+            grid[grid_idx] = 1
+            text_lines[grid_idx] = [line]
     
     inputfile.close()
         
@@ -179,13 +187,19 @@ if __name__=="__main__":
     import numpy
     from sklearn.svm import SVC
     import density_sampling
-    path="/home/julian/data/"
+#     path="/home/julian/data/"
+    path="/Users/ingenia/git/data/data_sampling/"
+    
     ins=ins.instrumento(path=path,logname="log.txt")
 #     features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/user_bot_data.tsv",[0,1,2],3)
-    originalFile=["/home/julian/data/user_bot_data.tsv"]
+    originalFile=["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"]
+#     originalFile=["/home/julian/data/user_bot_data.tsv"]
+
+#     outputFile="/home/julian/data/user_bot_data_density_sample.tsv"
+    outputFile="/Users/ingenia/git/data/data_sampling/data_density_sample.tsv"
     
 #     files=["user_bot_part00","user_bot_part01","user_bot_part02","user_bot_part03","user_bot_part04","user_bot_part05","user_bot_part06","user_bot_part07"]
 #     files=[ path+i for i in files]
 
-    vals = density_sampling.parallel_density_sampling(originalFile, "/home/julian/data/user_bot_data_density_sample.tsv", range(2,29,1), 1, 0, 0.025, 5, 8)
+    vals = density_sampling.parallel_density_sampling(originalFile, outputFile, range(2,29,1), 1, 0, 0.025, 5, 8)
     print vals
