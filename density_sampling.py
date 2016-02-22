@@ -188,15 +188,18 @@ if __name__=="__main__":
     from sklearn.svm import SVC
     import density_sampling
 #     path="/home/julian/data/"
-    path="/Users/ingenia/git/data/data_sampling/"
+#     path="/Users/ingenia/git/data/data_sampling/"
+    path="/home/julian/Dropbox/data/"
     
     ins=ins.instrumento(path=path,logname="log.txt")
 #     features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/user_bot_data.tsv",[0,1,2],3)
     originalFile=["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"]
+    originalFile=["%s/user_bot_data.tsv"%(path)]
 #     originalFile=["/home/julian/data/user_bot_data.tsv"]
 
 #     outputFile="/home/julian/data/user_bot_data_density_sample.tsv"
-    outputFile="/Users/ingenia/git/data/data_sampling/data_density_sample.tsv"
+#     outputFile="/Users/ingenia/git/data/data_sampling/data_density_sample.tsv"
+    outputFile="%sdata_density_sample.tsv"%(path)
     
 #     files=["user_bot_part00","user_bot_part01","user_bot_part02","user_bot_part03","user_bot_part04","user_bot_part05","user_bot_part06","user_bot_part07"]
 #     files=[ path+i for i in files]
