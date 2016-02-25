@@ -187,6 +187,7 @@ if __name__=="__main__":
     import numpy
     from sklearn.svm import SVC
     import density_sampling
+<<<<<<< HEAD
     
     runningAt="old"
     
@@ -203,9 +204,45 @@ if __name__=="__main__":
 #     outputFile="/home/julian/data/user_bot_data_density_sample.tsv"
 #     outputFile="/Users/ingenia/git/data/data_sampling/data_density_sample.tsv"
     outputFile="%sdata_density_sample.tsv"%(path)
+=======
+    import os
+    import numpy as np
+>>>>>>> 13fc38f062c685252ce5139518e2b9eb1ed183f7
     
-#     files=["user_bot_part00","user_bot_part01","user_bot_part02","user_bot_part03","user_bot_part04","user_bot_part05","user_bot_part06","user_bot_part07"]
-#     files=[ path+i for i in files]
-
-    vals = density_sampling.parallel_density_sampling(originalFile, outputFile, range(2,29,1), 1, 0, 0.025, 5)
-    print vals
+    from os.path import expanduser
+    home = expanduser("~")
+    
+    generateSample=True
+    loadDensitySample=False
+    
+    if generateSample:
+        path="%s/Dropbox/data/"%(home)
+        
+         
+        ins=ins.instrumento(path=path,logname="log.txt")
+    #     features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/user_bot_data.tsv",[0,1,2],3)
+    #     originalFile=["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"]
+        originalFile=["%s/user_bot_data.tsv"%(path)]
+    #     originalFile=["/home/julian/data/user_bot_data.tsv"]
+     
+    #     outputFile="/home/julian/data/user_bot_data_density_sample.tsv"
+    #     outputFile="/Users/ingenia/git/data/data_sampling/data_density_sample.tsv"
+        outputFile="%sdata_density_sample.tsv"%(path)
+         
+    #     files=["user_bot_part00","user_bot_part01","user_bot_part02","user_bot_part03","user_bot_part04","user_bot_part05","user_bot_part06","user_bot_part07"]
+    #     files=[ path+i for i in files]
+        
+        #All features
+        features= range(2,29,1)
+        features.pop(25)
+        #Subset of features
+#         features=[9]+range(11,25)+[26]
+        
+        vals = density_sampling.parallel_density_sampling(originalFile, outputFile,features, 1, 0, 0.0025, 5)
+        print vals
+        
+        
+    if loadDensitySample:
+        data=np.genfromtxt('/Users/ingenia/Dropbox/data/data_density_sample.tsv',delimiter='\t')
+        print(data.shape)
+        

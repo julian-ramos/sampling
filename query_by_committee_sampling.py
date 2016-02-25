@@ -6,6 +6,8 @@ import random
 import instrumento as ins
 import stringUtils as sU
 import shutil
+import numpy as np
+from scipy.stats import entropy 
 #p is the probability of choosing a sample that classified differenty by >= 2 classifiers
 def parallel_query_sampling(model_list, filenames, feature_order, truth_idx, p, num_parallel_jobs=8):
     log=ins.instrumento()
@@ -43,6 +45,8 @@ def query_sampling(in_args):
     outputfile = open(outputfilename,"w")
         
     different_count = numpy.zeros(len(features))
+    
+    predicts=[]
     for model in model_list:
         predict = model.predict(features)
         
@@ -53,8 +57,22 @@ def query_sampling(in_args):
 #                 different_count[i] = different_count[i] + 1
 
         #Here is an slightly faster version, ran tests and the outputs are identical
-        same = numpy.where(predict==truth)
-        different_count[same]+=1
+#         same = numpy.where(predict==truth)
+#         different_count[same]+=1
+
+
+        predicts.append(predict)
+    
+#     predicts=np.array(predicts)
+    for i2 in range(len(predicts[0])):
+        votes=[]
+        for i in range(len(predicts)):
+            votes.append(predicts[i][i2])
+        vals,counts=np.unique(votes,return_counts=True)
+        different_count[i2]=entropy(counts,base=2)
+        
+        
+            
                                 
         
     indexes = numpy.argsort(different_count)
@@ -79,8 +97,10 @@ if __name__=="__main__":
     from sklearn.linear_model import LogisticRegression
     from sklearn.naive_bayes import GaussianNB
     from sklearn.externals import joblib
-
     import query_by_committee_sampling
+    from os.path import expanduser
+    
+    home = expanduser("~")
     
     generateModels=False
     generateSample=True
@@ -126,17 +146,27 @@ if __name__=="__main__":
         joblib.dump(nb, './clfs/nb.pkl')
     
     if generateSample:
-        filename="/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"
+        filename="%s/Dropbox/data/user_bot_data.tsv"%(home)
+        outputFilename="%s/Dropbox/data/qbc_sample_data.tsv"%(home)
         features=range(2,29)
         features.pop(25)
         svm = joblib.load('./clfs/svm.pkl') 
         lr= joblib.load('./clfs/lr.pkl')
         nb = joblib.load('./clfs/nb.pkl')
-        filenameSample="/Users/ingenia/git/data/data_sampling/bots_sample.tsv"
+        filenameSample="%s/Dropbox/data/bots_sample.tsv"%(home)
+        
+        
+        
+        features= range(2,29,1)
+        features.pop(25)
         
         data, labels = load_tsv.load_tsv_features_truth(filename, features, 1)
+        vals=query_sampling([[svm,lr,nb], data, labels, int(0.0025*2e6), filename])
         
-        query_sampling([[svm,lr,nb], data, labels, int(0.0025*2e6), filename])
+#         vals=query_by_committee_sampling.parallel_query_sampling([svm,lr,nb],[filename] ,features,1,0.00025)
+#         print(vals)
+        
+        
 #         vals = query_by_committee_sampling.parallel_query_sampling([svm],["/Users/ingenia/git/data/data_sampling/previous_data/part1.tsv"]  ,[0,1,2],3,0.1,1)
         
 #         vals = query_by_committee_sampling.parallel_query_sampling([svm,nb,lr],[filename], features,1, 0.0025)
