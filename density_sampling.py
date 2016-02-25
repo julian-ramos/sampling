@@ -187,13 +187,16 @@ if __name__=="__main__":
     import numpy
     from sklearn.svm import SVC
     import density_sampling
+    
+    runningAt="old"
+    
 #     path="/home/julian/data/"
 #     path="/Users/ingenia/git/data/data_sampling/"
     path="/home/julian/Dropbox/data/"
     
     ins=ins.instrumento(path=path,logname="log.txt")
 #     features, truth = load_tsv.load_tsv_features_truth("/Users/ingenia/git/data/data_sampling/user_bot_data.tsv",[0,1,2],3)
-    originalFile=["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"]
+#     originalFile=["/Users/ingenia/git/data/data_sampling/user_bot_data.tsv"]
     originalFile=["%s/user_bot_data.tsv"%(path)]
 #     originalFile=["/home/julian/data/user_bot_data.tsv"]
 
